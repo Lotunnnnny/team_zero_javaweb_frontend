@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="utf-8">
+		<title>Test</title>
+		<link rel="stylesheet" type="text/css" href="./resources/style/theme/index.css"/>
+		<link rel="stylesheet" type="text/css" href="./resources/style/main.css"/>
+		<script type="text/javascript" src="./resources/js/vue.js"></script>
+		<script type="text/javascript" src="./resources/js/md5.js"></script>
+		<script type="text/javascript" src="./resources/js/element-ui.js"></script>
+		<script type="text/javascript" src="./resources/js/vue-components.js"></script>
+		<script src="./resources/js/node_modules/vue-cookies/vue-cookies.js"></script>
+	</head>
+	<body>
+		<div id="app">
+			<h1>Test: {{data}}</h1>
+		</div>
+	</body>
+</html>
+
+<script>
+	new Vue({
+		el: '#app',
+		data: function() {
+		    return {
+				data: '3245'
+			}
+		}
+	})
+</script>

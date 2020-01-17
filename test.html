@@ -3,17 +3,20 @@
 	<head>
 		<meta charset="utf-8">
 		<title>Test</title>
-		<link rel="stylesheet" type="text/css" href="./resources/style/theme/index.css"/>
-		<link rel="stylesheet" type="text/css" href="./resources/style/main.css"/>
-		<script type="text/javascript" src="./resources/js/vue.js"></script>
-		<script type="text/javascript" src="./resources/js/md5.js"></script>
-		<script type="text/javascript" src="./resources/js/element-ui.js"></script>
-		<script type="text/javascript" src="./resources/js/vue-components.js"></script>
-		<script src="./resources/js/node_modules/vue-cookies/vue-cookies.js"></script>
+		<link rel="stylesheet" type="text/css" href="./css/theme/index.css"/>
+		<link rel="stylesheet" type="text/css" href="./css/main.style"/>
+		<script type="text/javascript" src="./js/vue.js"></script>
+		<script type="text/javascript" src="./js/md5.js"></script>
+		<script type="text/javascript" src="./js/element-ui.js"></script>
+		<script type="text/javascript" src="./js/vue-components.js"></script>
+		<script src="./js/node_modules/vue-cookies/vue-cookies.js"></script>
+		<script type="text/javascript" src="./js/test/sign_up_test.js"></script>
 	</head>
 	<body>
 		<div id="app">
 			<h1>Test: {{data}}</h1>
+			<button @click="onClick">Press me!</button>
+			<h2>Press 'F12' to see test results in console!</h2>
 		</div>
 	</body>
 </html>
@@ -23,7 +26,12 @@
 		el: '#app',
 		data: function() {
 		    return {
-				data: '3245'
+				data: 'test'
+			}
+		},
+		methods: {
+			onClick() {
+				testValidateAll();
 			}
 		}
 	})

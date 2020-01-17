@@ -6,9 +6,9 @@
 		<link rel="stylesheet" type="text/css" href="./css/theme/index.css"/>
 		<script type="text/javascript" src="./js/vue.js"></script>
         <script type="text/javascript" src="./js/md5.js"></script>
+		<script type="text/javascript" src="./test/sign_up_test.js"></script>
 		<!-- import JavaScript -->
 		<script src="https://unpkg.com/element-ui/lib/index.js"></script>
-		<script src="./js/sign_up.js"></script>
 	</head>
 	<body>
 		<div id="app" :style='divStyle'>
@@ -35,11 +35,11 @@
 	</body>
 	
 	<script>
-	    new Vue({
+	    var vue = new Vue({
             el: '#app',
             data: function() {
 				var validateEmail = (rule, value, callback) => {
-					var reg = /^[A-Za-z0-9_\-\.]+\@[A-Za-z0-9_\-\.]+\.([A-Za-z]{2,6})$/; 
+					var reg = /^[A-Za-z0-9_\-\.+]+\@[A-Za-z0-9_\-\.]+\.([A-Za-z]{2,6})$/; 
 								//E-mail contains only one '@' character
 								//E-mail contains at least a dot ('.')
 								//E-mail contains between 2 and 6 characters after a dot ('.')
@@ -50,9 +50,9 @@
 					}
 				};
 				var validateUsername = (rule, value, callback) => {
-					var reg1 = /[^a-zA-Z0-9_\-\.]/; //Username can only contain number, character and ., -, _
+					var reg1 = /[^a-zA-Z0-9_\-.]/; //Username can only contain number, character and ., -, _
 					var reg2 = /^[0-9]/; //Username cannot start with numbers.
-					var reg3 = /.{3,30}/;					
+					var reg3 = /.{3,30}/; //The number of characters must be in between 3 and 30.
 					if (value === '') {
 						callback();
 					} else if (reg2.exec(value)) {
@@ -74,7 +74,7 @@
 					if (value === '') {
 						callback();
 					} else if (!reg1.exec(value)) {
-						callback(new Error('Password must contain uppercase and lowercase character, number, special character [@#!?$%^&+]'));
+						callback(new Error('Password must contain uppercase and lowercase character, number, special character (only character in [@#!?$%^&+])'));
 					} else if (reg2.exec(value)) {
 						callback(new Error('Password cannot contain white space'));
 					} else if (!reg3.exec(value)) {
@@ -95,18 +95,18 @@
                     },
                     rules: {
                         email: [
-							{ validator: validateEmail, trigger: 'blur' },
-							{ required: true, message: 'Please input email address.', trigger: 'blur'}
-						],
-                        name: [
-							{ validator: validateUsername, trigger: 'blur' },
-							{ required: true, message: 'Please input user name.', trigger: 'blur'}
-						],
-                        pwd: [
-							{ validator: validatePwd, trigger: 'blur' },
-							{ required: true, message: 'Please input password.', trigger: 'blur'}
+                    		{ validator: validateEmail, trigger: 'blur' },
+                    		{ required: true, message: 'Please input email address.', trigger: 'blur'}
                     	],
-					}
+                        name: [
+                    		{ validator: validateUsername, trigger: 'blur' },
+                    		{ required: true, message: 'Please input user name.', trigger: 'blur'}
+                    	],
+                        pwd: [
+                    		{ validator: validatePwd, trigger: 'blur' },
+                    		{ required: true, message: 'Please input password.', trigger: 'blur'}
+                    	],
+                    }
 	            };
             },
             mounted() {

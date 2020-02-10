@@ -1,0 +1,263 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="utf-8">
+		<title>Sign Up</title>
+		<link rel="stylesheet" type="text/css" href="./css/theme/index.css"/>
+		<script type="text/javascript" src="./js/vue.js"></script>
+        <script type="text/javascript" src="./js/md5.js"></script>
+		<script type="text/javascript" src="./js/test/sign_up_test.js"></script>
+		<script type="text/javascript" src="https://unpkg.com/element-ui/lib/index.js"></script>
+		<script type="text/javascript" src="./js/crypto/jsbn/jsbn.js"></script>
+		<script type="text/javascript" src="./js/crypto/jsbn/jsbn2.js"></script>
+		<script type="text/javascript" src="./js/crypto/jsbn/prng4.js"></script>
+		<script type="text/javascript" src="./js/crypto/jsbn/rng.js"></script>
+		<script type="text/javascript" src="./js/crypto/jsbn/ec.js"></script>
+		<script type="text/javascript" src="./js/crypto/jsbn/sec.js"></script>
+	</head>
+	<body>
+		<div id="app" :style='divStyle'>
+		<el-form :model="ruleForm" :rules="rules" ref="ruleForm" label-width="150px" class="demo-ruleForm">
+		  <el-form-item label="Email Address" prop="email">
+		    <el-input v-model="ruleForm.email"></el-input>
+		  </el-form-item>
+		  <el-form-item label="User Name" prop="name">
+		    <el-input v-model="ruleForm.name"></el-input>
+		  </el-form-item>
+		  <el-form-item label="Password" prop="pwd">
+		    <el-input v-model="ruleForm.pwd" show-password></el-input>
+		  </el-form-item>
+		  <el-form-item style="margin-top: 50px;">
+              <el-button type="primary" @click="submitForm('ruleForm')">Sign Up</el-button>
+              <el-button @click="resetForm('ruleForm')">Reset</el-button>
+              <el-button @click="onSignIn">Sign In</el-button>
+		  </el-form-item>
+		</el-form>
+            <div>n = {{ecdh.n}}</div>
+            <div>q = {{ecdh.q}}</div>
+            <div>a = {{ecdh.a}}</div>
+			<div>b = {{ecdh.b}}</div>
+			<div>gx = {{ecdh.gx}}</div>
+			<div>gy = {{ecdh.gy}}</div>
+			<div>privateKey = {{ecdh.privateKey}}</div>
+			<div>publicKeyX = {{ecdh.publicKeyX}}</div>
+			<div>publicKeyY = {{ecdh.publicKeyY}}</div>
+		</div>
+	</body>
+	
+	<script>
+	    var vue = new Vue({
+            el: '#app',
+            data: function() {
+				var validateEmail = (rule, value, callback) => {
+					var reg = /^[A-Za-z0-9_\-\.+]+\@[A-Za-z0-9_\-\.]+\.([A-Za-z]{2,6})$/; 
+								//E-mail contains only one '@' character
+								//E-mail contains at least a dot ('.')
+								//E-mail contains between 2 and 6 characters after a dot ('.')
+					if (value === '') {
+						callback();
+					} else if (!reg.exec(value)) {
+						callback(new Error('Please input a valid email address.'));
+					}
+					callback();
+				};
+				var validateUsername = (rule, value, callback) => {
+					var reg1 = /[^a-zA-Z0-9_\-.]/; //Username can only contain number, character and ., -, _
+					var reg2 = /^[0-9]/; //Username cannot start with numbers.
+					var reg3 = /.{3,30}/; //The number of characters must be in between 3 and 30.
+					if (value === '') {
+						callback();
+					} else if (reg2.exec(value)) {
+						callback(new Error('Username cannot start with numbers.'));
+					} else if (reg1.exec(value)) {
+						callback(new Error('Username can only contain numbers, characters and ., -, _'));
+					} else if (!reg3.exec(value)) {
+						callback(new Error('The number of characters must be in between 3 and 30.'));
+					}  
+					callback();
+				};
+				var validatePwd = (rule, value, callback) => {
+					var reg1 = /(?=.*[0-9])(?=.*[a-z])(?=.*[A-Z])(?=.*[@#!?$%^&+])/;
+								// Password contains at least 1 uppercase character
+								// Password contains at least 1 lowercase character
+								// Password contains at least 1 digit
+								// Password contains at least 1 special character
+					var reg2 = /\s/; // Password must not contain white spaces
+					var reg3 = /.{6,30}/; // Password is between 6 and 30 characters
+					if (value === '') {
+						callback();
+					} else if (!reg1.exec(value)) {
+						callback(new Error('Password must contain uppercase and lowercase character, number, special character (only character in [@#!?$%^&+])'));
+					} else if (reg2.exec(value)) {
+						callback(new Error('Password cannot contain white space'));
+					} else if (!reg3.exec(value)) {
+						callback(new Error('The number of characters must be in between 6 and 30.'));
+					}
+					callback();
+				};
+	            return {
+	                websocket: null,
+                    request: "",
+                    response: "",
+                    parsed_response: "",
+                    divStyle: "position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 500px; height: 300px;",
+                    ruleForm: {
+                        email: '',
+                        name: '',
+                        pwd: '',
+                        picture: '',				
+                    },
+					ecdh: {
+						n: '',
+						q: '',
+						a: '',
+						b: '',
+						gx: '',
+						gy: '',
+						privateKey: '',
+						publicKeyX: '',
+						publicKeyY: ''
+					},
+                    rules: {
+                        email: [
+                    		{ validator: validateEmail, trigger: 'blur' },
+                    		{ required: true, message: 'Please input email address.', trigger: 'blur'}
+                    	],
+                        name: [
+                    		{ validator: validateUsername, trigger: 'blur' },
+                    		{ required: true, message: 'Please input user name.', trigger: 'blur'}
+                    	],
+                        pwd: [
+                    		{ validator: validatePwd, trigger: 'blur' },
+                    		{ required: true, message: 'Please input password.', trigger: 'blur'}
+                    	],
+                    }
+	            };
+            },
+            mounted() {
+                if ('WebSocket' in window) {
+                    this.websocket = new WebSocket('ws://localhost:1234');
+                    this.initWebSocket();
+                } else {
+                    alert('Websocket is not supported by this browser!');
+                    return null;
+                }
+            },
+            beforeDestroy() {
+                this.websocket.close();
+            },
+            watch:{
+                response(newR, oldR) {
+                    this.parsed_response = JSON.parse(newR);
+                    if (this.parsed_response.REPLY === 'REGISTER: SUCCESS') {
+                        alert("Register successfully!");
+                        this.onSignIn();
+                    } else {
+                        console.log("Register failed!")
+                    }
+                }
+            },
+            methods: {
+				/*-----websocket configuration-----*/
+                initWebSocket() {
+                    //connection occurs error
+                    this.websocket.onerror = this.setErrorMessage;
+                    //connection succeeds
+                    this.websocket.onopen = this.setOnopenMessage;
+                    //get response from Server
+                    this.websocket.onmessage = this.setOnmessageMessage;
+                    //connection closes
+                    this.websocket.onclose = this.setOncloseMessage;
+                    //connection closes automatically after leaving websites
+                    window.onbeforeunload = this.onBeforeUnload;
+                },
+                setErrorMessage() {
+                    this.response = "WebSocket occurs error." + '   status：' + this.websocket.readyState;
+                },
+                setOnopenMessage() {
+                    this.response = "WebSocket succeeds." + '   status：' + this.websocket.readyState;
+                },
+                setOnmessageMessage(event) {
+                    this.response = event.data;
+                },
+                setOncloseMessage() {
+                    this.response = "WebSocket closes." + '   status：' + this.websocket.readyState;
+                },
+                onBeforeUnload() {
+                    this.websocket.close();
+                },
+                //send message (JSON) to Server
+                send() {
+                    this.websocket.send(this.request);
+                },
+				/*-----end of websocket configuration-----*/
+				
+				/*-----request for registration-----*/
+				submitForm(formName) {
+					this.generateKeys();
+					this.$refs[formName].validate((valid) => {
+					  if (valid && (this.websocket.readyState === 1)) {
+						this.request = "{\n" +
+								"type: \"REGISTER\",\n" +
+								"username:\"" + this.ruleForm.name + "\",\n" +
+								"password:\"" + hex_md5(this.ruleForm.pwd) + "\",\n" +
+								"email:\"" + this.ruleForm.email + "\",\n" +
+								"picture:\"" + this.ruleForm.picture + "\",\n" +
+								"publicKey:\"" + this.ecdh.publicKeyX + "\"\n" +
+								"}";
+						this.send();
+					  } else {
+					    console.log('Please follow rules!');
+					  }
+					});
+				},
+                onSignIn() {
+                    window.location.href = "/team_zero_javaweb_frontend/index.html";
+                },
+                resetForm(formName) {
+                    this.$refs[formName].resetFields();
+                },
+				/*-----end of request for registration-----*/
+				
+				/*-----encryption-----*/
+				generateKeys() {
+					this.initParams();
+					
+					var rng = new SecureRandom();
+					var n = new BigInteger(this.ecdh.n);
+					var n1 = n.subtract(BigInteger.ONE);
+					var r = new BigInteger(n.bitLength(), rng);					
+					this.ecdh.privateKey = r.mod(n1).add(BigInteger.ONE).toString();
+					
+					var curve = this.get_curve();
+					var G = this.get_G(curve);
+					var a = new BigInteger(this.ecdh.privateKey);
+					var P = G.multiply(a);
+					this.ecdh.publicKeyX = P.getX().toBigInteger().toString();
+					this.ecdh.publicKeyY = P.getY().toBigInteger().toString();
+				},
+				get_curve() {
+				  return new ECCurveFp(new BigInteger(this.ecdh.q),
+				    new BigInteger(this.ecdh.a),
+				    new BigInteger(this.ecdh.b));
+				},
+				get_G(curve) {
+				  return new ECPointFp(curve,
+				    curve.fromBigInteger(new BigInteger(this.ecdh.gx)),
+				    curve.fromBigInteger(new BigInteger(this.ecdh.gy)));
+				},
+				initParams() {
+					var c = getSECCurveByName("secp128r1");
+					
+					this.ecdh.q = c.getCurve().getQ().toString();
+					this.ecdh.a = c.getCurve().getA().toBigInteger().toString();
+					this.ecdh.b = c.getCurve().getB().toBigInteger().toString();
+					this.ecdh.gx = c.getG().getX().toBigInteger().toString();
+					this.ecdh.gy = c.getG().getY().toBigInteger().toString();
+					this.ecdh.n = c.getN().toString();
+				}
+				/*-----end of encryption-----*/
+            }
+	    })
+	</script>
+</html>

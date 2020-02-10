@@ -11,10 +11,20 @@
 		<script type="text/javascript" src="./js/vue-components.js"></script>
 		<script src="./js/node_modules/vue-cookies/vue-cookies.js"></script>
 		<script type="text/javascript" src="./js/test/sign_up_test.js"></script>
+		<script type="text/javascript" src="./js/crypto/jsbn/jsbn.js"></script>
+		<script type="text/javascript" src="./js/crypto/jsbn/jsbn2.js"></script>
+		<script type="text/javascript" src="./js/crypto/jsbn/prng4.js"></script>
+		<script type="text/javascript" src="./js/crypto/jsbn/rng.js"></script>
+		<script type="text/javascript" src="./js/crypto/jsbn/ec.js"></script>
+		<script type="text/javascript" src="./js/crypto/jsbn/sec.js"></script>
+		<script type="text/javascript" src="./js/crypto/jsbn/rsa.js"></script>
+		<script type="text/javascript" src="./js/crypto/jsbn/rsa2.js"></script>
+		<script type="text/javascript" src="./js/crypto/jsbn/sha1.js"></script>
+		<script type="text/javascript" src="./js/crypto/crypto-js/aes.js"></script>
 	</head>
 	<body>
 		<div id="app">
-			<h1>Test: {{data}}</h1>
+			<h5>Test: {{data}}</h5>
 			<button @click="onClick">Press me!</button>
 			<h2>Press 'F12' to see test results in console!</h2>
 		</div>
@@ -26,12 +36,19 @@
 		el: '#app',
 		data: function() {
 		    return {
-				data: 'test'
+				data: '',
 			}
 		},
 		methods: {
 			onClick() {
-				testValidateAll();
+				var shared_key = '2646294A404E635266556A576E5A7234';
+				// Encrypt
+				var ciphertext = CryptoJS.AES.encrypt('hello', shared_key, {mode: CryptoJS.mode.CBC, padding: CryptoJS.pad.Pkcs7}).toString();
+				console.log("ciphertext: " + rstr2b64(ciphertext));
+				// Decrypt
+				var bytes  = CryptoJS.AES.decrypt(ciphertext, shared_key);
+				var originalText = bytes.toString(CryptoJS.enc.Utf8);
+				console.log("originaltext: " + originalText);
 			}
 		}
 	})

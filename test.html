@@ -41,14 +41,23 @@
 		},
 		methods: {
 			onClick() {
-				var shared_key = '2646294A404E635266556A576E5A7234';
-				// Encrypt
-				var ciphertext = CryptoJS.AES.encrypt('hello', shared_key, {mode: CryptoJS.mode.CBC, padding: CryptoJS.pad.Pkcs7}).toString();
-				console.log("ciphertext: " + rstr2b64(ciphertext));
-				// Decrypt
-				var bytes  = CryptoJS.AES.decrypt(ciphertext, shared_key);
-				var originalText = bytes.toString(CryptoJS.enc.Utf8);
-				console.log("originaltext: " + originalText);
+				var shared_key_hex = '2646294A404E635266556A576E5A7234';
+				// // Encrypt
+				// var ciphertext = CryptoJS.AES.encrypt('hello', shared_key_a, {mode: CryptoJS.mode.CBC, padding: CryptoJS.pad.Pkcs7}).toString();
+				// console.log("ciphertext: " + rstr2b64(ciphertext));
+				// // Decrypt
+				// var bytes  = CryptoJS.AES.decrypt(ciphertext, shared_key_hex);
+				// var originalText = bytes.toString(CryptoJS.enc.Utf8);
+				// console.log("originaltext: " + originalText);
+				let encrypted = 'dTv5YAmSg86ifudFQrIF5J/Q+rrT4AnY0wvzb8UVVck=';
+				let message = CryptoJS.AES.decrypt(encrypted, shared_key_a).toString(CryptoJS.enc.Utf8);
+				console.log(message);
+			},
+			hex2a(hex){
+				var str = '';
+				for (var i = 0; (i < hex.length && hex.substr(i, 2) !== '00'); i += 2)
+					str += String.fromCharCode(parseInt(hex.substr(i, 2), 16));
+				return str;
 			}
 		}
 	})

@@ -123,7 +123,7 @@
         },
         mounted() {
             if ('WebSocket' in window) {
-                this.websocket = new WebSocket('ws://10.40.232.36:1234');
+                this.websocket = new WebSocket('ws://localhost:1234');
                 this.initWebSocket();
             } else {
                 alert('Websocket is not supported by this browser!');
@@ -142,8 +142,8 @@
                     case 'TEXT':
                         if (this.parsed_response.recipient !== this.self.name) return; //error forwarded message
                         sender = this.parsed_response.sender;
-						encrypted = rstr2b64(this.parsed_response.message);
-                        message = CryptoJS.AES.decrypt(encrypted, this.shared_key).toString(CryptoJS.enc.Utf8);;
+						encrypted = this.parsed_response.message;
+                        message = CryptoJS.AES.decrypt(encrypted, this.shared_key).toString(CryptoJS.enc.Utf8);
                         this.chatwith(sender);
                         //Todo: retrieve time instead of creating
                         time = new Date();
